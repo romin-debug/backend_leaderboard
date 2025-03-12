@@ -1,0 +1,110 @@
+{% extends 'layouts/main.njk' %}
+
+{% block content %}
+<h1>Gamer Leaderboard</h1>
+
+<ul id="leaderboard-list">
+    {% for player in leaderboard %}
+    <li>
+        {{ player.player }}: {{ player.score }}
+        {% if player.avatar %}
+        <img src="{{ player.avatar }}?{{ player.avatar | length }}" alt="{{ player.player }}'s avatar" width="50">
+        {% endif %}
+        <form action="/delete-player" method="POST" style="display: inline;">
+            <input type="hidden" name="player" value="{{ player.player }}">
+            <button type="submit">Delete</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+
+<a href="/update-score">Update Score</a>
+<a href="/add-player">Add Player</a>
+
+<h3>Upload Avatar</h3>
+<form action="/upload-avatar" method="POST" enctype="multipart/form-data">
+    <label>
+        Player Name: <input type="text" name="player" required>
+    </label>
+    <label>
+        Avatar: <input type="file" name="avatar" required>
+    </label>
+    <button type="submit">Upload Avatar</button>
+</form>
+
+<table id="leaderboard-table">
+    <thead>
+    <tr>
+        <th>Player</th>
+        <th>Score</th>
+        <th>Avatar</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for player in leaderboard %}
+    <tr>
+        <td>{{ player.player }}</td>
+        <td>{{ player.score }}</td>
+        <td>
+            {% if player.avatar %}
+                <img src="{{ player.avatar }}" alt="{{ player.player }}" width="50" height="50">
+                {% else %}
+                No avatar
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<a href="/download-leaderboard" download>Download Leaderboard as CSV</a>
+
+<script>
+    const socket = new WebSocket('ws://localhost:3000');
+
+    socket.onopen = () => {
+        console.log('WebSocket connection established');
+    };
+
+    socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        if (data.type === 'leaderboardUpdate') {
+            const leaderboardList = document.getElementById('leaderboard-list');
+            const leaderboardTableBody = document.querySelector('#leaderboard-table tbody');
+
+            leaderboardList.innerHTML = '';
+            leaderboardTableBody.innerHTML = '';
+
+            data.leaderboard.forEach(player => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    ${player.player}: ${player.score}
+                    ${player.avatar ? `<img src="${player.avatar}" alt="${player.player}'s avatar" width="50">` : ''}
+                    <form action="/delete-player" method="POST" style="display: inline;">
+                        <input type="hidden" name="player" value="${player.player}">
+                        <button type="submit">Delete</button>
+                    </form>
+                `;
+                leaderboardList.appendChild(listItem);
+
+                const tableRow = document.createElement('tr');
+                tableRow.innerHTML = `
+                    <td>${player.player}</td>
+                    <td>${player.score}</td>
+                    <td>${player.avatar ? `<a href="${player.avatar}" download>Download Avatar</a>` : ''}</td>
+                `;
+                leaderboardTableBody.appendChild(tableRow);
+            });
+        }
+    };
+
+    socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
+
+    socket.onclose = () => {
+        console.log('WebSocket connection closed');
+    };
+</script>
+{% endblock %}

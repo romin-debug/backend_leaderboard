@@ -1,0 +1,15 @@
+{% extends 'layouts/main.njk' %}
+
+{% block content %}
+<h1>Update Player Score</h1>
+
+<form action="/update-score" method="POST">
+    <label>
+        Player Name: <input type="text" name="player" required>
+    </label>
+    <label>
+        New Score: <input type="number" name="score" required>
+    </label>
+    <button type="submit">Update Score</button>
+</form>
+{% endblock %}

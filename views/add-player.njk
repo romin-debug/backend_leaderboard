@@ -1,0 +1,18 @@
+{% extends 'layouts/main.njk' %}
+
+{% block content %}
+<h1>Add New Player</h1>
+
+<form action="/add-player" method="POST" enctype="multipart/form-data">
+    <label>
+        Player Name: <input type="text" name="player" required>
+    </label>
+    <label>
+        Score: <input type="number" name="score" required>
+    </label>
+    <label>
+        Avatar:<input type="file" name="avatar" accept ="image/*"required>
+    </label>
+    <button type="submit">Add Player</button>
+</form>
+{% endblock %}

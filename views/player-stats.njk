@@ -1,0 +1,15 @@
+{% extends "layouts/main.njk" %}
+
+{% block content %}
+<div class="player-stats">
+    <h1>Player Statistics for {{ player.name }}</h1>
+    <img src="{{ player.avatar }}" alt="{{ player.name }}'s avatar" class="player-avatar">
+    <ul>
+        <li><strong>Total Games Played:</strong> {{ stats.totalGames }}</li>
+        <li><strong>Total Score:</strong> {{ stats.totalScore }}</li>
+        <li><strong>Average Score per Game:</strong> {{ stats.averageScore }}</li>
+        <li><strong>Last Game Score:</strong> {{ stats.lastGameScore }}</li>
+        <li><strong>Last Played:</strong> {{ stats.lastPlayed | date("YYYY-MM-DD HH:mm:ss") }}</li>
+    </ul>
+</div>
+{% endblock %}
